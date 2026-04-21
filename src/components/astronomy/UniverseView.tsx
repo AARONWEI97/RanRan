@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
+import { Film, Moon, Sun } from 'lucide-react';
 import localforage from 'localforage';
 import type { Photo } from '../../types';
 import { dbService } from '../../services/database';
 import { videoManager } from '../../services/videoElementManager';
 import { getPerformanceConfig } from '../../utils/performance';
-import { CONSTELLATIONS, type ConstellationKey } from './constants';
+import { type ConstellationKey } from './constants';
 import UniverseIntro from './UniverseIntro';
 import HologramCinema from './HologramCinema';
 import VideoManager from './VideoManager';
@@ -228,30 +229,67 @@ const UniverseView: React.FC<UniverseViewProps> = ({ photos, onPhotoClick }) => 
         </Suspense>
       </Canvas>
 
-      <div className="absolute top-4 left-4 z-50 flex items-center gap-2">
-        <button
-          onClick={toggleTheme}
-          className={`
-            px-3 py-1.5 rounded-lg text-sm font-medium transition-all
-            ${isDark 
-              ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20' 
-              : 'bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200'}
-            backdrop-blur-sm
-          `}
-        >
-          {isDark ? '🌙 深色' : '☀️ 浅色'}
-        </button>
+      <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
         <button
           onClick={() => setViewMode(prev => prev === 'solar' ? 'spiral' : 'solar')}
           className={`
-            px-3 py-1.5 rounded-lg text-sm font-medium transition-all
+            px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5
             ${isDark 
               ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20' 
               : 'bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200'}
             backdrop-blur-sm
           `}
         >
-          {viewMode === 'solar' ? '🌀 螺旋臂' : '☀️ 太阳系'}
+          {viewMode === 'solar' ? (
+            <>
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z" strokeLinecap="round"/>
+                <path d="M12 2c2.5 2.5 4 6 4 10s-1.5 7.5-4 10" strokeLinecap="round"/>
+                <path d="M12 2c-2.5 2.5-4 6-4 10s1.5 7.5 4 10" strokeLinecap="round"/>
+              </svg>
+              螺旋臂
+            </>
+          ) : (
+            <>
+              <Sun className="w-4 h-4" />
+              太阳系
+            </>
+          )}
+        </button>
+        <button
+          onClick={toggleTheme}
+          className={`
+            px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5
+            ${isDark 
+              ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20' 
+              : 'bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200'}
+            backdrop-blur-sm
+          `}
+        >
+          {isDark ? (
+            <>
+              <Moon className="w-4 h-4" />
+              深色
+            </>
+          ) : (
+            <>
+              <Sun className="w-4 h-4" />
+              浅色
+            </>
+          )}
+        </button>
+        <button
+          onClick={() => setShowVideoManager(true)}
+          className={`
+            px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5
+            ${isDark 
+              ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20' 
+              : 'bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200'}
+            backdrop-blur-sm
+          `}
+        >
+          <Film className="w-4 h-4" />
+          视频管理
         </button>
       </div>
 
@@ -294,43 +332,6 @@ const UniverseView: React.FC<UniverseViewProps> = ({ photos, onPhotoClick }) => 
           }
         }}
       />
-
-      <div className="absolute top-4 right-16 z-50 flex items-center gap-2">
-        <button
-          onClick={() => setShowVideoManager(true)}
-          className={`
-            px-3 py-1.5 rounded-lg text-sm font-medium transition-all
-            ${isDark 
-              ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20' 
-              : 'bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200'}
-            backdrop-blur-sm
-          `}
-        >
-          🎬 视频管理
-        </button>
-      </div>
-
-      <div className="absolute bottom-4 left-4 z-50">
-        <div className={`
-          px-3 py-1.5 rounded-lg text-xs
-          ${isDark ? 'bg-black/60 text-gray-300' : 'bg-white/80 text-gray-600'}
-          backdrop-blur-sm
-        `}>
-          🌌 宇宙视图 · {photos.length} 颗行星 · {Object.keys(CONSTELLATIONS).length} 个星座
-        </div>
-      </div>
-
-      <div className="absolute bottom-4 right-4 z-50">
-        <div className={`
-          px-3 py-1.5 rounded-lg text-xs
-          ${isDark ? 'bg-black/60 text-gray-400' : 'bg-white/80 text-gray-500'}
-          backdrop-blur-sm
-        `}>
-          🖱️ 拖拽旋转 | 滚轮缩放 | 点击行星查看
-        </div>
-      </div>
-
-
       </motion.div>
     </div>
   );

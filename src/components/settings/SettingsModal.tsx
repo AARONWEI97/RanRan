@@ -2,11 +2,12 @@ import { motion } from 'framer-motion';
 import { useUiStore } from '../../store/modules/uiStore';
 import { usePhotoStore } from '../../store/usePhotoStore';
 import { defaultThemes } from '../../types';
-import { Volume2, VolumeX, Grid3X3, RotateCw, Sparkles, Download, Upload } from 'lucide-react';
+import { Volume2, VolumeX, Grid3X3, RotateCw, Sparkles, Download, Upload, Palette } from 'lucide-react';
 import Button from '../ui/Button';
 import Modal from '../ui/Modal';
 import { exportAllData, downloadAsJson, readJsonFile, importData } from '../../services/dataExport';
 import { useRef } from 'react';
+import GradientSelector from './GradientSelector';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -14,7 +15,7 @@ interface SettingsModalProps {
 }
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
-  const { settings, updateSettings, showSuccess, showError } = useUiStore();
+  const { settings, updateSettings, showSuccess, showError, currentGradient, setGradient } = useUiStore();
   const { photos, albums, tags } = usePhotoStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -114,6 +115,21 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 )}
               </motion.button>
             ))}
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="text-lg font-cyber text-white flex items-center gap-2">
+            <Palette size={20} className="text-cyber-purple" />
+            渐变色彩系统
+          </h3>
+          
+          <div className="cyber-glass rounded-xl p-4">
+            <GradientSelector
+              currentGradient={currentGradient}
+              onSelectGradient={setGradient}
+              isDark={true}
+            />
           </div>
         </div>
 

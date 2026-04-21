@@ -43,7 +43,7 @@ interface PhotoState {
 }
 
 interface PhotoActions {
-  addPhoto: (file: File, albumId: string) => Promise<Photo>;
+  addPhoto: (file: File, albumId: string, onProgress?: (progress: number) => void) => Promise<Photo>;
   removePhoto: (id: string) => void;
   updatePhoto: (id: string, updates: Partial<Photo>) => void;
   addAlbum: (name: string, description?: string) => Album;
@@ -57,7 +57,6 @@ interface PhotoActions {
   setCurrentAlbum: (albumId: string | null) => void;
   setSelectedPhoto: (photoId: string | null) => void;
   setSearchQuery: (query: string) => void;
-  // setLayoutMode: (mode: 'galaxy') => void; // Layout mode is fixed now
   setSortOption: (option: 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc') => void;
   toggleFilterTag: (tag: string) => void;
   clearFilters: () => void;
@@ -151,32 +150,38 @@ export const usePhotoStore = create<PhotoStore>()(
       filterTags: [],
 
       // Actions
-      addPhoto: async (file: File, albumId: string) => {
+      addPhoto: async (file: File, albumId: string, onProgress?: (progress: number) => void) => {
         set({ isLoading: true });
         
         let url: string;
         let thumbnail: string;
         
         try {
+          onProgress?.(10);
           const result = await compressImageInWorker(file);
+          onProgress?.(70);
           url = result.compressed;
           thumbnail = result.thumbnail;
         } catch {
+          onProgress?.(10);
           const [compressedUrl, thumbUrl] = await Promise.all([
             compressImage(file),
             createThumbnail(file),
           ]);
+          onProgress?.(70);
           url = compressedUrl;
           thumbnail = thumbUrl;
         }
         
         const photoId = uuidv4();
+        onProgress?.(80);
         
         await blobStorage.setItem(photoId, url);
+        onProgress?.(90);
         
         const photo: Photo = {
           id: photoId,
-          url: '', 
+          url,
           thumbnail,
           name: file.name.replace(/\.[^/.]+$/, ''),
           tags: [],
@@ -197,6 +202,8 @@ export const usePhotoStore = create<PhotoStore>()(
             isLoading: false,
           };
         });
+        
+        onProgress?.(100);
         
         return photo;
       },
@@ -397,15 +404,6 @@ export const usePhotoStore = create<PhotoStore>()(
       initializeDefaultAlbum: () => {
         const { albums, photos, currentAlbumId } = get();
         
-        const validPhotos = photos.filter(photo => {
-          const url = photo.thumbnail || photo.url;
-          return url.startsWith('data:image/');
-        });
-        
-        if (validPhotos.length !== photos.length) {
-          set({ photos: validPhotos });
-        }
-        
         if (albums.length === 0) {
           const defaultAlbum: Album = {
             id: 'default',
@@ -418,6 +416,33 @@ export const usePhotoStore = create<PhotoStore>()(
         } else if (!currentAlbumId) {
           set({ currentAlbumId: albums[0].id });
         }
+        
+        const restoreUrls = async () => {
+          const photosNeedingRestore = photos.filter(p => !p.url && p.thumbnail);
+          for (const photo of photosNeedingRestore) {
+            try {
+              const storedUrl = await blobStorage.getItem<string>(photo.id);
+              if (storedUrl) {
+                set((state) => ({
+                  photos: state.photos.map(p => 
+                    p.id === photo.id ? { ...p, url: storedUrl } : p
+                  ),
+                }));
+              }
+            } catch {
+              const thumbUrl = photo.thumbnail;
+              if (thumbUrl && thumbUrl.startsWith('data:image/')) {
+                set((state) => ({
+                  photos: state.photos.map(p => 
+                    p.id === photo.id ? { ...p, url: thumbUrl } : p
+                  ),
+                }));
+              }
+            }
+          }
+        };
+        
+        restoreUrls();
       },
     }),
     {

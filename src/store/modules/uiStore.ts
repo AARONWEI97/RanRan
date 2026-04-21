@@ -2,10 +2,12 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { AppSettings, Theme } from '../../types';
 import { defaultSettings, defaultThemes } from '../../types';
+import type { GradientName } from '../../styles/theme';
 
 interface UiState {
   settings: AppSettings;
   currentTheme: Theme;
+  currentGradient?: GradientName;
   sidebarOpen: boolean;
   modalStates: {
     upload: boolean;
@@ -27,6 +29,7 @@ export interface NotificationItem {
 interface UiActions {
   updateSettings: (updates: Partial<AppSettings>) => void;
   setTheme: (themeId: string) => void;
+  setGradient: (gradient?: GradientName) => void;
   setSidebarOpen: (open: boolean) => void;
   setModalState: (modal: keyof UiState['modalStates'], open: boolean) => void;
   addNotification: (notification: Omit<NotificationItem, 'id' | 'timestamp'>) => void;
@@ -73,6 +76,10 @@ export const useUiStore = create<UiStore>()(
           currentTheme: theme,
           settings: { ...state.settings, theme },
         }));
+      },
+
+      setGradient: (gradient?: GradientName) => {
+        set({ currentGradient: gradient });
       },
 
       setSidebarOpen: (open: boolean) => {
@@ -135,6 +142,7 @@ export const useUiStore = create<UiStore>()(
       partialize: (state) => ({
         settings: state.settings,
         currentTheme: state.currentTheme,
+        currentGradient: state.currentGradient,
       }),
     }
   )

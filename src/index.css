@@ -373,3 +373,98 @@ input[type="file"] {
     opacity: 1;
   }
 }
+
+.cyber-gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--cyber-gradient-1, var(--cyber-blue)) 0%,
+    var(--cyber-gradient-2, var(--cyber-purple)) 50%,
+    var(--cyber-gradient-3, var(--cyber-pink)) 100%
+  );
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 4s ease infinite;
+}
+
+.cyber-gradient-border {
+  position: relative;
+  border: 2px solid transparent;
+  background: linear-gradient(var(--dark-card), var(--dark-card)) padding-box,
+              linear-gradient(
+                135deg,
+                var(--cyber-gradient-1, var(--cyber-blue)),
+                var(--cyber-gradient-2, var(--cyber-purple)),
+                var(--cyber-gradient-3, var(--cyber-pink))
+              ) border-box;
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+.cyber-gradient-button {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    var(--cyber-gradient-1, var(--cyber-blue)),
+    var(--cyber-gradient-2, var(--cyber-purple)),
+    var(--cyber-gradient-3, var(--cyber-pink))
+  );
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.cyber-gradient-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 245, 255, 0.4);
+}
+
+.cyber-gradient-card {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(18, 18, 26, 0.9),
+    rgba(18, 18, 26, 0.7)
+  );
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.cyber-gradient-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(
+    135deg,
+    var(--cyber-gradient-1, var(--cyber-blue)),
+    var(--cyber-gradient-2, var(--cyber-purple)),
+    var(--cyber-gradient-3, var(--cyber-pink))
+  );
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+  border-radius: inherit;
+  z-index: -1;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes ripple-effect {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}

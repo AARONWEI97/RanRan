@@ -1,3 +1,4 @@
+import { memo, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Settings, 
@@ -8,12 +9,10 @@ import {
   Menu,
   X
 } from 'lucide-react';
-import { useState } from 'react';
 import { usePhotoStore } from '../../store/usePhotoStore';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import SortControl from './SortControl';
-// import LayoutSwitcher from './LayoutSwitcher'; // Removed
 
 interface NavbarProps {
   onOpenSettings: () => void;
@@ -22,9 +21,17 @@ interface NavbarProps {
   onOpenTags: () => void;
 }
 
-export default function Navbar({ onOpenSettings, onOpenUpload, onOpenAlbums, onOpenTags }: NavbarProps) {
+const Navbar = memo(({ onOpenSettings, onOpenUpload, onOpenAlbums, onOpenTags }: NavbarProps) => {
   const { searchQuery, setSearchQuery } = usePhotoStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, [setSearchQuery]);
+
+  const toggleMobileMenu = useCallback(() => {
+    setMobileMenuOpen(prev => !prev);
+  }, []);
 
   return (
     <motion.nav
@@ -51,13 +58,12 @@ export default function Navbar({ onOpenSettings, onOpenUpload, onOpenAlbums, onO
 
             <div className="hidden md:flex items-center gap-4">
               <SortControl />
-              {/* <LayoutSwitcher className="mr-2" /> */}
 
               <div className="relative w-64">
                 <Input
                   placeholder="搜索照片..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={handleSearchChange}
                   icon={<Search size={18} />}
                 />
               </div>
@@ -75,7 +81,7 @@ export default function Navbar({ onOpenSettings, onOpenUpload, onOpenAlbums, onO
 
             <button
               className="md:hidden p-2 text-gray-400 hover:text-cyber-blue"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={toggleMobileMenu}
               aria-label={mobileMenuOpen ? '关闭菜单' : '打开菜单'}
               aria-expanded={mobileMenuOpen}
             >
@@ -96,13 +102,12 @@ export default function Navbar({ onOpenSettings, onOpenUpload, onOpenAlbums, onO
             <Input
               placeholder="搜索照片..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
               icon={<Search size={18} />}
             />
             
             <div className="flex justify-center gap-2">
               <SortControl />
-              {/* <LayoutSwitcher /> */}
             </div>
 
             <div className="flex gap-2">
@@ -121,4 +126,8 @@ export default function Navbar({ onOpenSettings, onOpenUpload, onOpenAlbums, onO
       )}
     </motion.nav>
   );
-}
+});
+
+Navbar.displayName = 'Navbar';
+
+export default Navbar;

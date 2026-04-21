@@ -54,8 +54,47 @@ export const themes: Record<string, Theme> = {
   },
 };
 
+// 渐变配置
+export const gradients = {
+  cyberAurora: {
+    name: '赛博极光',
+    colors: ['#00f5ff', '#b829dd', '#39ff14'],
+    angles: [0, 120, 240],
+  },
+  holographic: {
+    name: '全息彩虹',
+    colors: ['#ff2d75', '#00f5ff', '#b829dd', '#39ff14', '#ff6b35'],
+    angles: [0, 72, 144, 216, 288],
+  },
+  nebula: {
+    name: '星云紫',
+    colors: ['#b829dd', '#8b5cf6', '#cc1a1a', '#050000'],
+    angles: [0, 90, 180, 270],
+  },
+  sunset: {
+    name: '落日余晖',
+    colors: ['#ff6b35', '#f7931e', '#ff2d75'],
+    angles: [0, 120, 240],
+  },
+  deepOcean: {
+    name: '深海蓝',
+    colors: ['#00f5ff', '#0066ff', '#0a0a0f'],
+    angles: [0, 180, 360],
+  },
+} as const;
+
+export type GradientName = keyof typeof gradients;
+
 // CSS变量生成器
-export const generateThemeVariables = (theme: Theme): string => {
+export const generateThemeVariables = (theme: Theme, gradientName?: GradientName): string => {
+  const gradient = gradientName ? gradients[gradientName] : null;
+  const gradientVars = gradient ? `
+    --cyber-gradient-1: ${gradient.colors[0]};
+    --cyber-gradient-2: ${gradient.colors[1] || gradient.colors[0]};
+    --cyber-gradient-3: ${gradient.colors[2] || gradient.colors[0]};
+    --cyber-gradient-name: ${gradient.name};
+  ` : '';
+  
   return `
     --cyber-primary: ${theme.primaryColor};
     --cyber-secondary: ${theme.secondaryColor};
@@ -68,6 +107,7 @@ export const generateThemeVariables = (theme: Theme): string => {
     --dark-bg: #0a0a0f;
     --dark-card: #12121a;
     --dark-border: #1e1e2e;
+    ${gradientVars}
   `;
 };
 
@@ -78,9 +118,9 @@ export const useCurrentTheme = (): Theme => {
 };
 
 // 应用主题到DOM
-export const applyThemeToDocument = (theme: Theme) => {
+export const applyThemeToDocument = (theme: Theme, gradientName?: GradientName) => {
   const root = document.documentElement;
-  root.style.cssText += generateThemeVariables(theme);
+  root.style.cssText = generateThemeVariables(theme, gradientName);
 };
 
 // 主题相关的CSS类生成器
@@ -92,6 +132,10 @@ export const themeClasses = {
   buttonPink: 'cyber-button-pink',
   card: 'cyber-card',
   scanline: 'scanline',
+  gradientText: 'cyber-gradient-text',
+  gradientBorder: 'cyber-gradient-border',
+  gradientButton: 'cyber-gradient-button',
+  gradientCard: 'cyber-gradient-card',
 };
 
 // 颜色工具函数

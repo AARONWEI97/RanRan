@@ -19,6 +19,8 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
   const [newAlbumName, setNewAlbumName] = useState('');
   const [showNewAlbum, setShowNewAlbum] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [currentFileIndex, setCurrentFileIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDrag = (e: React.DragEvent) => {
@@ -66,7 +68,6 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
         setFiles((prev) => [...prev, ...selectedFiles]);
       }
       
-      // 清空 input 值，确保可以重复选择相同文件
       e.target.value = '';
     }
   };
@@ -75,10 +76,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const [uploadProgress, setUploadProgress] = useState(0);
-
   const handleUpload = async (e?: React.MouseEvent) => {
-    // 阻止任何可能的默认提交行为
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -96,34 +94,33 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
       
       setUploading(true);
       setUploadProgress(0);
+      setCurrentFileIndex(0);
       
-      // 降低并发量到1，确保绝对稳定，避免OOM崩溃
       const BATCH_SIZE = 1;
-      let completedCount = 0;
       
       for (let i = 0; i < files.length; i += BATCH_SIZE) {
         const chunk = files.slice(i, i + BATCH_SIZE);
+        setCurrentFileIndex(i);
+        
         await Promise.all(chunk.map(async (file) => {
           try {
-            await addPhoto(file, albumId);
-            // 每次上传后稍微暂停，给GC时间
+            await addPhoto(file, albumId, (progress: number) => {
+              const fileProgress = (i / files.length) * 100 + (progress / 100) * (100 / files.length);
+              setUploadProgress(Math.round(fileProgress));
+            });
             await new Promise(resolve => setTimeout(resolve, 50));
           } catch (err) {
             console.error(`Failed to upload ${file.name}:`, err);
-          } finally {
-            completedCount++;
-            setUploadProgress(Math.round((completedCount / files.length) * 100));
           }
         }));
       }
       
-      // 上传成功后清理状态
+      setUploadProgress(100);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       setFiles([]);
       setNewAlbumName('');
       setShowNewAlbum(false);
-      
-      // 提示用户上传成功
-      alert(`成功上传 ${files.length} 张照片！`);
       
       onClose();
     } catch (error) {
@@ -132,6 +129,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
     } finally {
       setUploading(false);
       setUploadProgress(0);
+      setCurrentFileIndex(0);
     }
   };
 
@@ -266,6 +264,34 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
           </div>
         )}
 
+        {uploading && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-cyber text-cyber-blue">上传进度</span>
+              <span className="text-white font-mono">{uploadProgress}%</span>
+            </div>
+            
+            <div className="w-full h-3 bg-dark-bg rounded-full overflow-hidden border border-white/10">
+              <motion.div
+                className="h-full rounded-full relative overflow-hidden"
+                style={{
+                  background: 'linear-gradient(90deg, #00f5ff, #b829dd, #00f5ff)',
+                  backgroundSize: '200% 100%',
+                  width: `${uploadProgress}%`,
+                }}
+                animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+              />
+            </div>
+            
+            <p className="text-xs text-gray-400 text-center">
+              {uploadProgress < 100
+                ? `正在上传第 ${currentFileIndex + 1}/${files.length} 张照片...`
+                : '上传完成！'}
+            </p>
+          </div>
+        )}
+
         <div className="flex justify-end gap-3">
           <Button variant="ghost" onClick={handleClose}>
             取消
@@ -276,7 +302,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
             isLoading={uploading}
             disabled={files.length === 0}
           >
-            {uploading ? `上传中 ${uploadProgress}%` : `上传 ${files.length > 0 ? `(${files.length})` : ''}`}
+            {uploading ? '上传中...' : `上传 ${files.length > 0 ? `(${files.length})` : ''}`}
           </Button>
         </div>
       </div>

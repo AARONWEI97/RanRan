@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { usePhotoStore } from '../../../store/usePhotoStore';
 import UniverseView from '../../astronomy/UniverseView';
@@ -7,9 +8,9 @@ interface PhotoGridProps {
   onPhotoClick: (photoId: string) => void;
 }
 
-export default function PhotoGrid({ onPhotoClick }: PhotoGridProps) {
+const PhotoGrid = memo(({ onPhotoClick }: PhotoGridProps) => {
   const { getFilteredPhotos, isLoading } = usePhotoStore();
-  const photos = getFilteredPhotos();
+  const photos = useMemo(() => getFilteredPhotos(), [getFilteredPhotos]);
 
   return (
     <div className="h-full relative">
@@ -18,16 +19,6 @@ export default function PhotoGrid({ onPhotoClick }: PhotoGridProps) {
           <CyberSkeleton variant="planet" count={8} />
         </div>
       )}
-
-      <div className="absolute top-4 left-4 z-40 pointer-events-none">
-        <motion.p 
-          className="text-gray-400 text-sm"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          🌌 宇宙视图 · {photos.length} 颗行星
-        </motion.p>
-      </div>
 
       <UniverseView photos={photos} onPhotoClick={onPhotoClick} />
 
@@ -47,4 +38,8 @@ export default function PhotoGrid({ onPhotoClick }: PhotoGridProps) {
       )}
     </div>
   );
-}
+});
+
+PhotoGrid.displayName = 'PhotoGrid';
+
+export default PhotoGrid;

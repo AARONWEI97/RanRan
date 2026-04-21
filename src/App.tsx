@@ -1,12 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar } from 'lucide-react';
+import { Calendar, Music } from 'lucide-react';
 import { usePhotoStore } from './store/usePhotoStore';
 import { useUiStore } from './store/modules/uiStore';
 import { applyThemeToDocument } from './styles/theme';
 import { dbService } from './services/database';
 import { useMusicPlayer } from './services/musicPlayer';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import type { MusicRecommendation } from './services/musicRecommendation';
 import MetaverseBackground from './components/3d/MetaverseBackground';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
@@ -19,6 +20,7 @@ import MusicPlayer from './components/music/MusicPlayer';
 import Toast from './components/ui/Toast';
 import OnboardingGuide from './components/ui/OnboardingGuide';
 import TimelineView from './components/photos/TimelineView';
+import MusicRecommendationPanel from './components/music/MusicRecommendationPanel';
 
 function App() {
   const { 
@@ -27,9 +29,9 @@ function App() {
     initializeDefaultAlbum,
     getFilteredPhotos 
   } = usePhotoStore();
-  const { currentTheme } = useUiStore();
+  const { currentTheme, currentGradient } = useUiStore();
   const { isPlaying, pauseMusic, resumeMusic } = useMusicPlayer();
-  const photos = getFilteredPhotos();  
+  const photos = useMemo(() => getFilteredPhotos(), [getFilteredPhotos]);  
   const [showSidebar, setShowSidebar] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -39,6 +41,7 @@ function App() {
     return !localStorage.getItem('ranran-onboarding-completed');
   });
   const [showTimeline, setShowTimeline] = useState(false);
+  const [showMusicRecommendation, setShowMusicRecommendation] = useState(false);
 
   const handlePhotoClick = useCallback((photoId: string) => {
     setSelectedPhoto(photoId);
@@ -104,8 +107,8 @@ function App() {
   });
 
   useEffect(() => {
-    applyThemeToDocument(currentTheme);
-  }, [currentTheme]);
+    applyThemeToDocument(currentTheme, currentGradient);
+  }, [currentTheme, currentGradient]);
 
   useEffect(() => {
     const initDB = async () => {
@@ -176,6 +179,15 @@ function App() {
 
       <MusicPlayer />
       
+      <MusicRecommendationPanel
+        photos={photos}
+        isOpen={showMusicRecommendation}
+        onClose={() => setShowMusicRecommendation(false)}
+        onPlayMusic={(rec: MusicRecommendation) => {
+          console.log('Playing recommended music:', rec);
+        }}
+      />
+
       <TimelineView
         photos={photos}
         onPhotoClick={handlePhotoClick}
@@ -199,18 +211,26 @@ function App() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="fixed bottom-4 right-4 z-30 flex items-center gap-2"
+        className="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2"
       >
         <button
-          className="p-3 cyber-glass rounded-full border border-cyber-blue/20 hover:border-cyber-blue/50 transition-colors"
+          className="p-3 cyber-glass rounded-full border border-cyber-blue/20 hover:border-cyber-blue/50 transition-colors hover:scale-110"
+          onClick={() => setShowMusicRecommendation(true)}
+          title="情绪音乐推荐"
+        >
+          <Music size={18} className="text-cyan-400" />
+        </button>
+        <button
+          className="p-3 cyber-glass rounded-full border border-cyber-blue/20 hover:border-cyber-blue/50 transition-colors hover:scale-110"
           onClick={() => setShowTimeline(true)}
           title="时间轴"
         >
-          <Calendar size={16} className="text-cyan-400" />
+          <Calendar size={18} className="text-cyan-400" />
         </button>
         <button
-          className="p-3 cyber-glass rounded-full border border-cyber-blue/20 hover:border-cyber-blue/50 transition-colors"
+          className="p-3 cyber-glass rounded-full border border-cyber-blue/20 hover:border-cyber-blue/50 transition-colors hover:scale-110"
           onClick={() => setShowSidebar(true)}
+          title="侧边栏"
         >
           <div className="w-3 h-3 rounded-full bg-cyber-blue animate-pulse" />
         </button>

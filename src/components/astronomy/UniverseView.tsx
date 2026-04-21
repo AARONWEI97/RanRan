@@ -230,15 +230,18 @@ const UniverseView: React.FC<UniverseViewProps> = ({ photos, onPhotoClick }) => 
       </Canvas>
 
       <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
-        <button
+        <motion.button
           onClick={() => setViewMode(prev => prev === 'solar' ? 'spiral' : 'solar')}
           className={`
-            px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5
+            px-4 py-2 rounded-lg text-sm font-cyber transition-all flex items-center gap-2
             ${isDark 
-              ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20' 
-              : 'bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200'}
-            backdrop-blur-sm
+              ? 'bg-gradient-to-r from-blue-900/40 to-purple-900/40 text-cyan-400 border border-cyan-500/30 hover:border-cyan-500/60'
+              : 'bg-gradient-to-r from-blue-100/80 to-purple-100/80 text-blue-800 border border-blue-400/30 hover:border-blue-400/60'
+            }
+            backdrop-blur-lg hover:shadow-[0_0_15px_rgba(0,245,255,0.3)]
           `}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
           {viewMode === 'solar' ? (
             <>
@@ -255,16 +258,20 @@ const UniverseView: React.FC<UniverseViewProps> = ({ photos, onPhotoClick }) => 
               太阳系
             </>
           )}
-        </button>
-        <button
+        </motion.button>
+        
+        <motion.button
           onClick={toggleTheme}
           className={`
-            px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5
+            px-4 py-2 rounded-lg text-sm font-cyber transition-all flex items-center gap-2
             ${isDark 
-              ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20' 
-              : 'bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200'}
-            backdrop-blur-sm
+              ? 'bg-gradient-to-r from-indigo-900/40 to-purple-900/40 text-purple-400 border border-purple-500/30 hover:border-purple-500/60'
+              : 'bg-gradient-to-r from-indigo-100/80 to-purple-100/80 text-purple-800 border border-purple-400/30 hover:border-purple-400/60'
+            }
+            backdrop-blur-lg hover:shadow-[0_0_15px_rgba(184,41,221,0.3)]
           `}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
           {isDark ? (
             <>
@@ -277,20 +284,24 @@ const UniverseView: React.FC<UniverseViewProps> = ({ photos, onPhotoClick }) => 
               浅色
             </>
           )}
-        </button>
-        <button
+        </motion.button>
+        
+        <motion.button
           onClick={() => setShowVideoManager(true)}
           className={`
-            px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5
+            px-4 py-2 rounded-lg text-sm font-cyber transition-all flex items-center gap-2
             ${isDark 
-              ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20' 
-              : 'bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200'}
-            backdrop-blur-sm
+              ? 'bg-gradient-to-r from-pink-900/40 to-red-900/40 text-pink-400 border border-pink-500/30 hover:border-pink-500/60'
+              : 'bg-gradient-to-r from-pink-100/80 to-red-100/80 text-pink-800 border border-pink-400/30 hover:border-pink-400/60'
+            }
+            backdrop-blur-lg hover:shadow-[0_0_15px_rgba(255,45,117,0.3)]
           `}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
           <Film className="w-4 h-4" />
           视频管理
-        </button>
+        </motion.button>
       </div>
 
       <ConstellationSelector

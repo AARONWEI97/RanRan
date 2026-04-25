@@ -240,9 +240,9 @@ src/
 ### Phase 6：🚀 视觉与功能进阶 ✅ 已完成
 
 > 🎯 目标：突破视觉体验瓶颈，拓展核心功能边界，提升产品竞争力
-> 
+>
 > 📅 完成日期：2026-04-21
-> 📅 更新日期：2026-04-22（修复照片持久化 + 上传进度条）
+> 📅 更新日期：2026-04-22（UI修复 + 照片持久化 + 上传进度条）
 
 #### 🎨 视觉效果提升方案
 
@@ -253,12 +253,13 @@ src/
 | 微交互动画升级 | P6-3 | ⭐⭐ | P0 | ✅ | 新增 `components/ui/MagneticButton.tsx`（磁吸按钮 + 涟漪效果），`components/ui/PageTransition.tsx`（4 种过渡动画），CSS 新增 `@keyframes ripple-effect` |
 | 排版层次优化 | P6-4 | ⭐ | P1 | ⏳ 待实现 |
 | 数据可视化图表 | P6-5 | ⭐⭐⭐ | P2 | ⏳ 待实现 |
+| UI 样式统一 | P6-18 | ⭐⭐ | P0 | ✅ | UniverseView 右上角按钮重写为赛博朋克风格：渐变背景 + 发光边框 + font-cyber 字体 + 悬停阴影动画；图标替换为 Lucide 组件解决 emoji 渲染问题；按钮从左侧移至右上角避免遮挡标题 |
 
 #### 🔮 功能拓展方向
 
 | 方向 | 编号 | 难度 | 预期价值 | 状态 | 实际效果 |
 |------|------|------|----------|------|----------|
-| 情绪化音乐推荐 | P6-10 | ⭐⭐⭐ | 音乐使用率提升 50%+ | ✅ | 新增 `services/musicRecommendation.ts`（15+ 标签映射/时间段分析/季节分析），`components/music/MusicRecommendationPanel.tsx` 推荐面板，App.tsx 底部新增音乐推荐按钮 |
+| 情绪化音乐推荐 | P6-10 | ⭐⭐⭐ | 音乐使用率提升 50%+ | ✅ | 新增 `services/musicRecommendation.ts`（15+ 标签映射/时间段分析/季节分析），`components/music/MusicRecommendationPanel.tsx` 推荐面板，App.tsx 右侧垂直排列浮动按钮（🎵音乐/📅时间轴/⚡侧边栏） |
 | 时光穿梭交互 | P6-13 | ⭐⭐⭐ | 回忆沉浸感提升 45%+ | ✅ | 新增 `components/photos/TimeTravel.tsx`，按年份分组照片，全屏年份视图 + 动画网格，ESC 快捷键关闭 |
 | 照片上传进度条 | P6-16 | ⭐⭐ | 用户体验提升 | ✅ | UploadModal 新增渐变动画进度条 + 百分比显示 + 当前文件索引提示，photoStore.addPhoto 支持 onProgress 回调 |
 | 照片持久化修复 | P6-17 | ⭐⭐ | 数据完整性 | ✅ | 修复刷新后照片不显示问题，initializeDefaultAlbum 异步从 blobStorage 恢复 url 字段，新上传照片 url 直接存储 base64 |
@@ -323,4 +324,4 @@ src/
 也可以提出路线图之外的新需求，我会评估后补充到文档中。
 
 ---
-*文档生成于：2026-04-19 | 路线图更新于：2026-04-21 | Phase 5 完成于：2026-04-20 | Phase 6 完成于：2026-04-21*
+*文档生成于：2026-04-19 | 路线图更新于：2026-04-22 | Phase 5 完成于：2026-04-20 | Phase 6 完成于：2026-04-22*
